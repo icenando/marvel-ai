@@ -5,7 +5,7 @@ export const uploadToDb = (items: StoryResults[]) => {
   const db = new AWS.DynamoDB.DocumentClient();
 
   console.info("Upserting to DB...");
-  items.forEach(item => {
+  items.forEach(async item => {
     const record: StoryResults = {
       id: item.id,
       title: item.title,
@@ -14,9 +14,12 @@ export const uploadToDb = (items: StoryResults[]) => {
       end: item.end,
       url: item.url,
     };
-    db.put({
-      TableName: "TodoTable",
-      Item: record,
-    }).promise();
+
+    await db
+      .put({
+        TableName: "MarvelEvents",
+        Item: record,
+      })
+      .promise();
   });
 };

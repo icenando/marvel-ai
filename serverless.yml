@@ -30,7 +30,7 @@ custom:
 
 resources:
   Resources:
-    MarvelEventsTable:
+    MarvelEvents:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: MarvelEvents
