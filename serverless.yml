@@ -9,12 +9,14 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: eu-west-2
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:*
-      Resource:
-        - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEvents
+  iam:
+    role:
+      statements:
+      - Effect: Allow
+        Action:
+          - dynamodb:*
+        Resource:
+          - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEvents
 
 functions:
   fetchStories:

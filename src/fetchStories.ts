@@ -79,12 +79,12 @@ const fetchStories = async () => {
     }
   }
 
-  const stringResponse = JSON.stringify(data, null, 2);
-  console.info(`Total records fetched ${data.length} `);
+  console.info(`Total records fetched: ${data.length}`);
 
-  uploadToDb(data);
-
-  return stringResponse;
+  const dbResult = uploadToDb(data);
+  if (dbResult) {
+    throw dbResult;
+  }
 };
 
 export const handler = fetchStories;

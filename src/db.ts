@@ -1,25 +1,22 @@
 import * as AWS from "aws-sdk";
 import { StoryResults } from "../types/marvelResponse";
 
-export const uploadToDb = (items: StoryResults[]) => {
+export const uploadToDb = (items: StoryResults[]): AWS.AWSError | void => {
   const db = new AWS.DynamoDB.DocumentClient();
 
-  console.info("Upserting to DB...");
-  items.forEach(async item => {
-    const record: StoryResults = {
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      start: item.start,
-      end: item.end,
-      url: item.url,
-    };
+  console.info(JSON.stringify(items, null, 2));
 
-    await db
-      .put({
-        TableName: "MarvelEvents",
-        Item: record,
-      })
-      .promise();
+  console.info("Writing to DB...");
+  items.forEach(async item => {
+    try {
+      await db
+        .put({
+          TableName: "MarvelEvents",
+          Item: item,
+        })
+        .promise();
+    } catch (e) {
+      return e;
+    }
   });
 };
