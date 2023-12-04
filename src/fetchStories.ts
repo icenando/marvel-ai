@@ -81,7 +81,10 @@ const fetchStories = async () => {
 
   console.info(`Total records fetched: ${data.length}`);
 
-  const dbResult = await uploadToDb(data);
+  const dbResult = await uploadToDb(
+    data,
+    data.map(item => item.id)
+  );
   if (dbResult === "ERROR") {
     throw dbResult;
   }

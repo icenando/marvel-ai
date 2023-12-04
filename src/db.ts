@@ -2,13 +2,14 @@ import * as AWS from "aws-sdk";
 import { StoryResults } from "../types/marvelResponse";
 
 export const uploadToDb = async (
-  items: StoryResults[]
+  items: StoryResults[],
+  ids: number[]
 ): Promise<string | void> => {
   const db = new AWS.DynamoDB.DocumentClient();
 
   console.info(JSON.stringify(items, null, 2));
 
-  console.info("Writing to DB...");
+  console.info("Writing events to DB...");
   for (const item of items) {
     await db
       .put(
@@ -21,7 +22,27 @@ export const uploadToDb = async (
             console.log(err);
             return "ERROR";
           } else {
-            console.log(`SUCCESS id: ${item.id}`);
+            console.log(`INSERTED EVENT ID ${item.id}`);
+          }
+        }
+      )
+      .promise();
+  }
+
+  console.info("Writing IDs to DB...");
+  for (const id of ids) {
+    await db
+      .put(
+        {
+          TableName: "MarvelEventsIds",
+          Item: { id, used: false },
+        },
+        err => {
+          if (err) {
+            console.log(err);
+            return "ERROR";
+          } else {
+            console.log(`INSERTED ID ${id}`);
           }
         }
       )
