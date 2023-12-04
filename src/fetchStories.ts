@@ -45,7 +45,7 @@ const toResults = (rawData: MarvelResponse): StoryResults[] => {
 
   return rawData.data.results.map(item => {
     return {
-      id: item.id.toString(),
+      id: item.id,
       title: item.title,
       description: item.description,
       start: item.start,

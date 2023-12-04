@@ -16,12 +16,12 @@ export const uploadToDb = async (
           TableName: "MarvelEvents",
           Item: item,
         },
-        (err, data) => {
+        err => {
           if (err) {
             console.log(err);
             return "ERROR";
           } else {
-            console.log("SUCCESS", data);
+            console.log(`SUCCESS id: ${item.id}`);
           }
         }
       )

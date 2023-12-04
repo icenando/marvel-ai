@@ -24,7 +24,7 @@ export type Urls = {
 };
 
 export type StoryResults = {
-  id: string;
+  id: number;
   title: string;
   description: string;
   start: string; // String but in Date format
