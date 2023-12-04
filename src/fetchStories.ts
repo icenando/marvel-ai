@@ -45,7 +45,7 @@ const toResults = (rawData: MarvelResponse): StoryResults[] => {
 
   return rawData.data.results.map(item => {
     return {
-      id: item.id,
+      id: item.id.toString(),
       title: item.title,
       description: item.description,
       start: item.start,
@@ -81,10 +81,12 @@ const fetchStories = async () => {
 
   console.info(`Total records fetched: ${data.length}`);
 
-  const dbResult = uploadToDb(data);
-  if (dbResult) {
+  const dbResult = await uploadToDb(data);
+  if (dbResult === "ERROR") {
     throw dbResult;
   }
+
+  return dbResult;
 };
 
 export const handler = fetchStories;
