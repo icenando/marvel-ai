@@ -18,13 +18,20 @@ provider:
         Resource:
           - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEvents
 
+package: 
+  individually: true
+
 functions:
+
   fetchStories:
     handler: src/fetchStories.handler
     events:
       - httpApi:
           path: /fetchMarvelEvents
           method: get
+          
+  fetchUnused:
+    handler: src/fetchUnused.handler
 
 custom:
   dotenv:
