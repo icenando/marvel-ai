@@ -17,7 +17,6 @@ provider:
           - dynamodb:*
         Resource:
           - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEvents
-          - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEventsIds
 
 functions:
   fetchStories:
@@ -37,17 +36,6 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: MarvelEvents
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: N
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-    MarvelEventsIdsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: MarvelEventsIds
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id

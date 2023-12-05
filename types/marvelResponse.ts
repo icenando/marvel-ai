@@ -30,6 +30,7 @@ export type StoryResults = {
   start: string; // String but in Date format
   end: string;
   url: string;
+  used: boolean;
 };
 
 export enum QueryType {
