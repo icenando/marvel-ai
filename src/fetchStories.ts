@@ -53,6 +53,7 @@ const toResults = (rawData: MarvelResponse): StoryResults[] => {
       url: getUrl(item.urls),
       used: false,
       imgUrl: "",
+      revisedPrompt: "",
     };
   });
 };
@@ -83,12 +84,7 @@ const fetchStories = async () => {
 
   console.info(`Total records fetched: ${data.length}`);
 
-  const dbResult = await uploadToDb(data);
-  if (dbResult === "ERROR") {
-    throw dbResult;
-  }
-
-  return dbResult;
+  await uploadToDb(data);
 };
 
 export const handler = fetchStories;

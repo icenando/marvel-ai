@@ -17,6 +17,10 @@ provider:
           - dynamodb:*
         Resource:
           - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEvents
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource: arn:aws:s3:::dall-e-images-bucket/*
 
 package: 
   individually: true
@@ -25,9 +29,17 @@ functions:
 
   fetchStories:
     handler: src/fetchStories.handler
+    timeout: 6
           
   fetchUnused:
     handler: src/fetchUnused.handler
+    timeout: 30
+    events:
+      - s3:
+          bucket: dall-e-images-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: images/
 
 custom:
   dotenv:
