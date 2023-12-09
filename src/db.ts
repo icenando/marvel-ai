@@ -63,14 +63,14 @@ export const fetchOne = async (): Promise<void | StoryResults> => {
 };
 
 export const updateOne = async (
-  id: string,
+  id: number,
   imgUrl: string,
   revisedPrompt: string
 ) => {
   const params = {
     TableName: eventsTable,
     Key: {
-      id: "1234", // Replace with the actual ID you want to update
+      id,
     },
     UpdateExpression:
       "SET #used = :usedValue, #imgUrl = :imgUrlValue, #revisedPrompt = :revisedPrompt",
@@ -84,19 +84,22 @@ export const updateOne = async (
       ":imgUrlValue": imgUrl,
       ":revisedPrompt": revisedPrompt,
     },
-    ReturnValues: "ALL_OLD, ALL_NEW", // Optional: specifies that the response should include the updated attributes
+    ReturnValues: "ALL_NEW", // Optional: specifies that the response should include the updated attributes
   };
 
   console.info("Updating document in DB...");
-  db.update(params, (err, data) => {
-    if (err) {
-      console.error("Unable to update. Error:", JSON.stringify(err, null, 2));
-      throw err;
-    } else {
-      console.info(
-        "Update succeeded. Updated item ('attributesNew is the updated document):",
-        JSON.stringify(data, null, 2)
-      );
-    }
-  }).promise();
+  return new Promise((resolve, reject) => {
+    db.update(params, (err, data) => {
+      if (err) {
+        console.error("Failed to update. Error:", JSON.stringify(err, null, 2));
+        reject(err);
+      } else {
+        console.info(
+          "Update succeeded. Updated item ('attributesNew is the updated document):",
+          JSON.stringify(data, null, 2)
+        );
+        resolve(data);
+      }
+    });
+  });
 };

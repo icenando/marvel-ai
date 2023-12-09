@@ -10,7 +10,7 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
 
   const body = {
     model: "dall-e-3",
-    prompt: `Create a ${style} based on the following prompt, ignoring references to the artists who created this story and focusing on the summary of the story: ${description}`,
+    prompt: `Create a ${style} based on the following prompt, ignoring references to the artists who created this story and focusing on the summary of the story. Do not include any text in the image: ${description}`,
   };
 
   const options = {
@@ -31,7 +31,7 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
       throw e;
     });
 
-  if (!resp.data[0]) {
+  if (!resp?.data[0]) {
     throw `ERROR: the response is missing an URL for the image: ${JSON.stringify(
       resp,
       null,
@@ -65,17 +65,21 @@ const fetchUnused = async () => {
   console.info(`FETCHED EVENT: ${JSON.stringify(todaysEvent, null, 2)}`);
 
   // TODO: fetch image from Dall-E url
-  const { description } = todaysEvent;
-  const id = todaysEvent.id.toString();
+  const { description, id } = todaysEvent;
 
   const dallEResponse = await sendToDallE(description);
   const { revised_prompt, url: imageUrl } = dallEResponse.data[0];
 
   const imgResponse = await FethcImageFromUrl(imageUrl);
-  const pathToS3Image = `events/${id}`;
+  const pathToS3Image = `events/${id.toString()}`;
 
   await uploadImgToS3(pathToS3Image, imgResponse);
-  await updateOne(id, pathToS3Image, revised_prompt);
+  try {
+    await updateOne(id, pathToS3Image, revised_prompt);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
 export const handler = fetchUnused;
