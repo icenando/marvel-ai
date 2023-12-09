@@ -42,7 +42,6 @@ export const fetchOne = async (): Promise<void | StoryResults> => {
     ExpressionAttributeValues: {
       ":value": false,
     },
-    Limit: 1, // Limit to 1 item
   };
 
   // Perform the query
