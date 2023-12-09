@@ -1,6 +1,6 @@
 import { fetchOne, updateOne } from "./db";
-import * as AWS from "aws-sdk";
 import { DallEResponse } from "../types/dalleResponse";
+import { uploadImgToS3 } from "./s3";
 
 const sendToDallE = async (description: string): Promise<DallEResponse> => {
   const dall_eUrl = process.env.DALL_E_URL;
@@ -43,43 +43,16 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
   return resp;
 };
 
-interface FethcImageAndUploadToS3Props {
-  imageUrl: string;
-  objectKey: string;
-}
-const FethcImageAndUploadToS3 = async ({
-  imageUrl,
-  objectKey,
-}: FethcImageAndUploadToS3Props) => {
-  const s3 = new AWS.S3();
+const FethcImageFromUrl = async (imageUrl: string) => {
+  console.info(`Fetching image from Dall-E's response URL: ${imageUrl}`);
 
-  const bucketName = process.env.BUCKET_NAME;
-
-  try {
-    console.info(`Fetching image from Dall-E's response URL: ${imageUrl}`);
-    const response = await fetch(imageUrl);
-    // const imageBuffer = new String(response.body); TODO: this has to be a Buffer object
-
-    console.info(`Saving image to s3: ${bucketName}/${objectKey}`);
-    const uploadParams = {
-      Bucket: bucketName,
-      Key: objectKey,
-      Body: imageBuffer,
-      ContentType: response.headers.get("content-type"),
-    };
-
-    const uploadResult = await s3
-      .upload(uploadParams, (err: Error) => {
-        if (err) {
-          console.error("Failed to upload to s3");
-          throw err;
-        }
-      })
-      .promise();
-    console.log("Image uploaded successfully:", uploadResult.Location);
-  } catch (error) {
-    console.error("Error:", error);
+  const response = await fetch(imageUrl);
+  if (!response) {
+    throw `ERROR: Failed to fetch image from url. The response was: ${JSON.stringify(
+      response
+    )}`;
   }
+  return response;
 };
 
 const fetchUnused = async () => {
@@ -98,8 +71,10 @@ const fetchUnused = async () => {
   const dallEResponse = await sendToDallE(description);
   const { revised_prompt, url: imageUrl } = dallEResponse.data[0];
 
+  const imgResponse = await FethcImageFromUrl(imageUrl);
   const pathToS3Image = `events/${id}`;
-  await FethcImageAndUploadToS3({ imageUrl, objectKey: pathToS3Image });
+
+  await uploadImgToS3(pathToS3Image, imgResponse);
   await updateOne(id, pathToS3Image, revised_prompt);
 };
 

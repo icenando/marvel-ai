@@ -88,17 +88,15 @@ export const updateOne = async (
   };
 
   console.info("Updating document in DB...");
-  await db
-    .update(params, (err, data) => {
-      if (err) {
-        console.error("Unable to update. Error:", JSON.stringify(err, null, 2));
-        throw err;
-      } else {
-        console.info(
-          "Update succeeded. Updated item ('attributesNew is the updated document):",
-          JSON.stringify(data, null, 2)
-        );
-      }
-    })
-    .promise();
+  db.update(params, (err, data) => {
+    if (err) {
+      console.error("Unable to update. Error:", JSON.stringify(err, null, 2));
+      throw err;
+    } else {
+      console.info(
+        "Update succeeded. Updated item ('attributesNew is the updated document):",
+        JSON.stringify(data, null, 2)
+      );
+    }
+  }).promise();
 };
