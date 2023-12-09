@@ -1,6 +1,5 @@
 import * as AWS from "aws-sdk";
 import { StoryResults } from "../types/marvelResponse";
-import { QueryOutput } from "aws-sdk/clients/dynamodb";
 
 const db = new AWS.DynamoDB.DocumentClient();
 
@@ -30,7 +29,7 @@ export const uploadToDb = async (
   }
 };
 
-export const fetchOne = async (): Promise<void | AWS.DynamoDB.QueryOutput> => {
+export const fetchOne = async (): Promise<void | StoryResults> => {
   const params = {
     TableName: 'MarvelEvents',
     FilterExpression: '#used = :value',
@@ -53,7 +52,7 @@ export const fetchOne = async (): Promise<void | AWS.DynamoDB.QueryOutput> => {
         "Query succeeded. Item:",
         JSON.stringify(data.Items[0], null, 2)
       );
-      return data.Items[0];
+      return data.Items[0] as StoryResults;
     }
   }).promise();
 };

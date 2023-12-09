@@ -31,6 +31,7 @@ export type StoryResults = {
   end: string;
   url: string;
   used: boolean;
+  imgUrl: string;
 };
 
 export enum QueryType {

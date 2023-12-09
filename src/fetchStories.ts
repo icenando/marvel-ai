@@ -9,8 +9,8 @@ import {
 import * as crypto from "crypto";
 
 const buildUrl = ({ queryType, limit, offset }: FetcherProps): string => {
-  const privateK = process.env.PRIVATE_KEY;
-  const publicK = process.env.PUBLIC_KEY;
+  const privateK = process.env.MARVEL_PRIVATE_KEY;
+  const publicK = process.env.MARVEL_PUBLIC_KEY;
 
   const ts = Date.now();
 
@@ -52,6 +52,7 @@ const toResults = (rawData: MarvelResponse): StoryResults[] => {
       end: item.end,
       url: getUrl(item.urls),
       used: false,
+      imgUrl: "",
     };
   });
 };
