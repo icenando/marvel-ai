@@ -5,6 +5,12 @@ plugins:
   - serverless-dotenv-plugin
   - serverless-plugin-typescript
 
+custom:
+  dotenv:
+    path: .env
+
+  dallEImagesbucket: dall-e-images-bucket
+
 provider:
   name: aws
   runtime: nodejs18.x
@@ -20,7 +26,7 @@ provider:
       - Effect: Allow
         Action:
           - s3:PutObject
-        Resource: arn:aws:s3:::dall-e-images-bucket/*
+        Resource: arn:aws:s3:::${self:custom.dallEImagesbucket}/*
 
 package: 
   individually: true
@@ -29,15 +35,13 @@ functions:
 
   fetchStories:
     handler: src/fetchStories.handler
-    timeout: 6
+    timeout: 10
           
   fetchUnused:
     handler: src/fetchUnused.handler
     timeout: 30
-
-custom:
-  dotenv:
-    path: .env
+    environment:
+      BUCKET: ${self:custom.dallEImagesbucket}
 
 resources:
   Resources:
@@ -52,3 +56,8 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+
+    DallEImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.dallEImagesbucket}
