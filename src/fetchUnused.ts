@@ -13,7 +13,7 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
     model: "dall-e-3",
     prompt: `Create a ${style} style painting based on the following prompt, 
     ignoring the artists who created this story if there are any references 
-    to them. Focusing on the summary of the story. Do not include 
+    to them. Focus on the summary of the story. Do not include 
     any text in the resulting image. Ensure that there are no DC comics 
     characters in the resulting image: ${description}`,
   };
