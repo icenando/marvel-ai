@@ -23,7 +23,7 @@ export type Urls = {
   url: string;
 };
 
-export type StoryResults = {
+export type StoryResult = {
   id: number;
   title: string;
   description: string;

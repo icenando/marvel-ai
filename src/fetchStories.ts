@@ -3,7 +3,7 @@ import {
   FetcherProps,
   MarvelResponse,
   QueryType,
-  StoryResults,
+  StoryResult,
   Urls,
 } from "../types/marvelResponse";
 import * as crypto from "crypto";
@@ -34,7 +34,7 @@ const fetcher = async ({
     });
 };
 
-const toResults = (rawData: MarvelResponse): StoryResults[] => {
+const toResults = (rawData: MarvelResponse): StoryResult[] => {
   const getUrl = (items: Urls[]) => {
     const url = items
       .filter(item => item.type === "detail")
@@ -60,7 +60,7 @@ const toResults = (rawData: MarvelResponse): StoryResults[] => {
 
 const fetchStories = async () => {
   let hasAllResults = false;
-  let data: StoryResults[] = [];
+  let data: StoryResult[] = [];
   let fetcherProps: FetcherProps = { offset: 0 };
   let attributionText: string = "";
 

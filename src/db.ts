@@ -1,11 +1,11 @@
 import * as AWS from "aws-sdk";
-import { StoryResults } from "../types/marvelResponse";
+import { StoryResult } from "../types/marvelResponse";
 
 const db = new AWS.DynamoDB.DocumentClient();
 const eventsTable = process.env.EVENTS_TABLE;
 
 export const uploadToDb = async (
-  items: StoryResults[]
+  items: StoryResult[]
 ): Promise<string | void> => {
   console.info(JSON.stringify(items, null, 2));
 
@@ -32,7 +32,7 @@ export const uploadToDb = async (
   }
 };
 
-export const fetchOne = async (): Promise<void | StoryResults> => {
+export const fetchOne = async (): Promise<void | StoryResult> => {
   const params = {
     TableName: eventsTable,
     FilterExpression: "#used = :value",
@@ -55,7 +55,41 @@ export const fetchOne = async (): Promise<void | StoryResults> => {
           "Query succeeded. Item:",
           JSON.stringify(data.Items[0], null, 2)
         );
-        resolve(data.Items[0] as StoryResults);
+        resolve(data.Items[0] as StoryResult);
+      }
+    });
+  });
+};
+
+export const fetchOneWithId = async (
+  id: number
+): Promise<void | StoryResult> => {
+  if (!eventsTable) {
+    throw "Couldn't read table name from env vars";
+  }
+
+  const params = {
+    TableName: eventsTable,
+    KeyConditionExpression: "id = :id",
+    ExpressionAttributeValues: {
+      ":id": id,
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    db.query(params, (err, data) => {
+      if (err) {
+        console.error(
+          "fetchSingleEventWithId failed with error:",
+          JSON.stringify(err, null, 2)
+        );
+        reject(err);
+      } else {
+        console.log(
+          "fetchSingleEventWithId query succeeded. Item:",
+          JSON.stringify(data.Items, null, 2)
+        );
+        resolve(data.Items![0] as StoryResult);
       }
     });
   });
