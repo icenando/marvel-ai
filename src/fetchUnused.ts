@@ -15,8 +15,8 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
     ignoring the artists who created this story if there are any references 
     to them. Focus on the summary of the story. Do not include 
     any text in the resulting image. Ensure that there are no DC comics 
-    characters in the resulting image, and that there is racial, gender and 
-    physical diversity: ${description}`,
+    characters in the resulting image, and that there is racial, gender, 
+    physical and sexual diversity: ${description}`,
   };
 
   const options = {
