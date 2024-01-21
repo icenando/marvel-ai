@@ -57,6 +57,18 @@ resources:
           - AttributeName: id
             KeyType: HASH
 
+    CommentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Comments
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
     DallEImagesBucket:
       Type: AWS::S3::Bucket
       Properties:
