@@ -100,22 +100,26 @@ export const updateOne = async (
   imgUrl: string,
   revisedPrompt: string
 ) => {
+  const dateUpdated = new Date().toISOString();
+
   const params = {
     TableName: eventsTable,
     Key: {
       id,
     },
     UpdateExpression:
-      "SET #used = :usedValue, #imgUrl = :imgUrlValue, #revisedPrompt = :revisedPrompt",
+      "SET #used = :usedValue, #imgUrl = :imgUrlValue, #revisedPrompt = :revisedPrompt, #dateUpdated = :dateUpdated",
     ExpressionAttributeNames: {
       "#used": "used",
       "#imgUrl": "imgUrl",
       "#revisedPrompt": "revisedPrompt",
+      "#dateUpdated": "dateUpdated",
     },
     ExpressionAttributeValues: {
       ":usedValue": true,
       ":imgUrlValue": imgUrl,
       ":revisedPrompt": revisedPrompt,
+      ":dateUpdated": dateUpdated,
     },
     ReturnValues: "ALL_NEW", // Optional: specifies that the response should include the updated attributes
   };

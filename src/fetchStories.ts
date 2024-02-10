@@ -26,7 +26,7 @@ const fetcher = async ({
   offset = 0,
 }: FetcherProps): Promise<MarvelResponse> => {
   return await fetch(buildUrl({ queryType, limit, offset }), {
-    signal: AbortSignal.timeout(10 * 1000),
+    signal: AbortSignal.timeout(10 * 2000),
   })
     .then(resp => resp.json() as unknown as MarvelResponse)
     .catch(e => {
@@ -54,6 +54,7 @@ const toResults = (rawData: MarvelResponse): StoryResult[] => {
       used: false,
       imgUrl: "",
       revisedPrompt: "",
+      dateUpdated: "",
     };
   });
 };
