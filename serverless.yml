@@ -9,7 +9,7 @@ custom:
   dotenv:
     path: .env
 
-  dallEImagesbucket: dall-e-images-bucket
+  caravarvelImagesbucket: caravarvel-images-bucket
 
 provider:
   name: aws
@@ -26,7 +26,7 @@ provider:
       - Effect: Allow
         Action:
           - s3:PutObject
-        Resource: arn:aws:s3:::${self:custom.dallEImagesbucket}/*
+        Resource: arn:aws:s3:::${self:custom.caravarvelImagesbucket}/*
 
 package: 
   individually: true
@@ -35,13 +35,17 @@ functions:
 
   fetchStories:
     handler: src/fetchStories.handler
-    timeout: 10
+    timeout: 20
           
   fetchUnused:
     handler: src/fetchUnused.handler
     timeout: 30
+    events:
+      - schedule:
+          rate: cron(0 10 * * ? *)
+          enabled: true
     environment:
-      BUCKET: ${self:custom.dallEImagesbucket}
+      BUCKET: ${self:custom.caravarvelImagesbucket}
 
 resources:
   Resources:
@@ -84,7 +88,25 @@ resources:
             Projection:
               ProjectionType: ALL
 
-    # DallEImagesBucket:
-    #   Type: AWS::S3::Bucket
-    #   Properties:
-    #     BucketName: ${self:custom.dallEImagesbucket}
+    CaravarvelImagesbucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.caravarvelImagesbucket}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          IgnorePublicAcls: false
+          BlockPublicPolicy: false
+          RestrictPublicBuckets: false
+
+    CaravarvelImagesBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref CaravarvelImagesbucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: "Statement1"
+              Effect: "Allow"
+              Principal: "*"
+              Action: "s3:GetObject"
+              Resource: !Sub "arn:aws:s3:::${self:custom.caravarvelImagesbucket}/*"
