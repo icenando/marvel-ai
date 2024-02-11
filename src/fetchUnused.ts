@@ -61,23 +61,31 @@ const FethcImageFromUrl = async (imageUrl: string) => {
   return response;
 };
 
-const fetchUnused = async (event: { id: string; description: string }) => {
-  const { id: incomingId, description: incomingDescription } = event;
+const fetchUnused = async (event: {
+  requiredEventId: string;
+  customDescription: string;
+}) => {
+  const { requiredEventId, customDescription } = event;
 
-  if (incomingDescription && !incomingId) {
+  if (customDescription && !requiredEventId) {
     throw `id is required for custom dall-e calls`;
   }
 
-  if (incomingId) {
-    console.info(`RECEIVED CUSTOM ID ${incomingId}`);
-    if (incomingDescription) {
-      console.info(`RECEIVED CUSTOM DESCRIPTION: ${incomingDescription}`);
+  if (requiredEventId) {
+    console.info(`RECEIVED CUSTOM ID ${requiredEventId}`);
+    if (customDescription) {
+      console.info(`RECEIVED CUSTOM DESCRIPTION: ${customDescription}`);
     }
+  } else {
+    console.info(
+      `RECEIVED REQUEST WITH NO CUSTOM ID - WILL SEARCH FOR NEXT UNUSED EVENT`
+    );
   }
 
-  const todaysEvent: void | StoryResult = incomingId
-    ? await fetchOneWithId(parseInt(incomingId))
-    : await fetchOne();
+  const todaysEvent: void | StoryResult =
+    requiredEventId?.length <= 4 // TODO: in case AWS event id still being picked up. Replace for "requiredEventId" once I figure out how to skip AWS's event.
+      ? await fetchOneWithId(parseInt(requiredEventId))
+      : await fetchOne();
 
   if (!todaysEvent) {
     throw "No unused documents left, or DB is empty";
@@ -86,8 +94,8 @@ const fetchUnused = async (event: { id: string; description: string }) => {
   console.info(`FETCHED EVENT: ${JSON.stringify(todaysEvent, null, 2)}`);
 
   const { id } = todaysEvent;
-  const description = incomingDescription
-    ? incomingDescription
+  const description = customDescription
+    ? customDescription
     : todaysEvent.description;
 
   const dallEResponse = await sendToDallE(description);
