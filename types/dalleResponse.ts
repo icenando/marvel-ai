@@ -4,6 +4,6 @@ export type DallEResponse = {
 };
 
 type Data = {
-  revised_prompt: string;
+  revisedPrompt: string;
   url: string;
 };

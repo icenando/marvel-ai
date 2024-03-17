@@ -9,7 +9,13 @@ custom:
   dotenv:
     path: .env
 
-  caravarvelImagesbucket: caravarvel-images-bucket
+  eventsTable: ${env.EVENTS_TABLE}
+  imagesbucket: ${env.BUCKET_NAME}
+  # TOPICS
+  generateImageTopicName: ${env.GENERATE_IMAGE_TOPIC_NAME}
+  fetchImageTopicName: ${env.FETCH_IMAGE_TOPIC_NAME}
+  updateDocumentTopicName: ${env.UPDATE_DOCUMENT_TOPIC_NAME}
+  revalidatePathTopicName: ${env.REVALIDATE_PATH_TOPIC_NAME}
 
 provider:
   name: aws
@@ -22,17 +28,20 @@ provider:
         Action:
           - dynamodb:*
         Resource:
-          - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/MarvelEvents
+          - arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self.custom.eventsTable}
       - Effect: Allow
         Action:
           - s3:PutObject
-        Resource: arn:aws:s3:::${self:custom.caravarvelImagesbucket}/*
+        Resource: arn:aws:s3:::${self:custom.imagesbucket}/*
+      - Effect: Allow
+        Action:
+          - sns:Publish
+        Resource: !Ref ${self:custom.generateImageTopicName}
 
 package: 
   individually: true
 
 functions:
-
   fetchStories:
     handler: src/fetchStories.handler
     timeout: 20
@@ -45,14 +54,42 @@ functions:
           rate: cron(0 10 * * ? *)
           enabled: true
     environment:
-      BUCKET: ${self:custom.caravarvelImagesbucket}
+      TOPIC_ARN: !Ref ${self:custom.generateImageTopicName}
+
+  generateImage:
+    handler: src/generateImage.handler
+    events:
+      - sns: ${self:custom.generateImageTopicName}
+    environment:
+      BUCKET: ${self:custom.imagesbucket}
+      TOPIC_ARN: !Ref GenerateImageTopic
 
 resources:
   Resources:
+    GenerateImageTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.generateImageTopicName}
+
+    FetchImageTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.fetchImageTopicName}
+
+    UpdateDocumentTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.updateDocumentTopicName}
+
+    RevalidatePathTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.revalidatePathTopicName}
+
     MarvelEventsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: MarvelEvents
+        TableName: ${self.custom.eventsTable}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id
@@ -91,7 +128,7 @@ resources:
     CaravarvelImagesbucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.caravarvelImagesbucket}
+        BucketName: ${self:custom.imagesbucket}
         PublicAccessBlockConfiguration:
           BlockPublicAcls: false
           IgnorePublicAcls: false
@@ -101,7 +138,7 @@ resources:
     CaravarvelImagesBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
-        Bucket: !Ref CaravarvelImagesbucket
+        Bucket: ${self:custom.imagesbucket}
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -109,4 +146,4 @@ resources:
               Effect: "Allow"
               Principal: "*"
               Action: "s3:GetObject"
-              Resource: !Sub "arn:aws:s3:::${self:custom.caravarvelImagesbucket}/*"
+              Resource: !Sub "arn:aws:s3:::${self:custom.imagesbucket}/*"
