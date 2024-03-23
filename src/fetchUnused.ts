@@ -14,9 +14,10 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
     prompt: `Create a ${style} style painting based on the following prompt, 
     ignoring the artists who created this story if there are any references 
     to them. Focus on the summary of the story. Do not include 
-    any text in the resulting image. Ensure that there are no DC comics 
-    characters in the resulting image, and that there is racial, gender, 
-    physical and sexual diversity: ${description}`,
+    any text in the resulting image. Ensure that there are no copyrighted 
+    characters in the resulting image, and that there is ethnic, gender, 
+    physical and sexual diversity. Replace any elements of this prompt with 
+    generic ones to avoid breach of copyright: ${description}`,
   };
 
   const options = {
@@ -37,8 +38,8 @@ const sendToDallE = async (description: string): Promise<DallEResponse> => {
       throw e;
     });
 
-  if (!resp?.data[0]) {
-    throw `ERROR: the response is missing an URL for the image: ${JSON.stringify(
+  if (!resp.data || !resp?.data[0]) {
+    throw `ERROR: the response is missing an URL for the image. The response was: \n${JSON.stringify(
       resp,
       null,
       2
