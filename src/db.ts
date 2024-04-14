@@ -1,6 +1,7 @@
 import * as AWS from "aws-sdk";
 import { StoryResult } from "../types/marvelResponse";
 
+const eventBridge = new AWS.EventBridge();
 const db = new AWS.DynamoDB.DocumentClient();
 const eventsTable = process.env.EVENTS_TABLE;
 
@@ -46,10 +47,23 @@ export const fetchOne = async (): Promise<void | StoryResult> => {
 
   // Perform the query
   return new Promise((resolve, reject) => {
-    db.scan(params, (err, data) => {
+    db.scan(params, async (err, data) => {
       if (err) {
         console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
-        reject(err);
+        try {
+          await eventBridge
+            .disableRule({
+              Name: "marvel-ai-fetch-events-de-FetchUnusedEventsRuleSche-mp8UuiYYaN44",
+            })
+            .promise();
+          reject(err);
+        } catch (disableError) {
+          console.error(
+            "Unable to disable rule. Error:",
+            JSON.stringify(disableError, null, 2)
+          );
+          reject(err);
+        }
       } else {
         console.log(
           "Query succeeded. Item:",

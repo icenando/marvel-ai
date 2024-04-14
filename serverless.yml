@@ -10,6 +10,7 @@ custom:
     path: .env
 
   caravarvelImagesbucket: caravarvel-images-bucket
+  evenBridgeCronJob: marvel-ai-fetch-events-de-FetchUnusedEventsRuleSche-mp8UuiYYaN44
 
 provider:
   name: aws
@@ -27,6 +28,10 @@ provider:
         Action:
           - s3:PutObject
         Resource: arn:aws:s3:::${self:custom.caravarvelImagesbucket}/*
+      - Effect: Allow
+        Action:
+          - events:DisableRule
+        Resource: arn:aws:events:${self:provider.region}:${aws:accountId}:rule/${self:custom.evenBridgeCronJob}
 
 package: 
   individually: true
