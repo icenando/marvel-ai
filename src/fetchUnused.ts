@@ -1,4 +1,9 @@
-import { fetchOne, fetchOneWithId, updateOne } from "./db";
+import {
+  disableEventBridgeRule,
+  fetchOne,
+  fetchOneWithId,
+  updateOne,
+} from "./db";
 import { DallEResponse } from "../types/dalleResponse";
 import { uploadImgToS3 } from "./s3";
 import { StoryResult } from "../types/marvelResponse";
@@ -89,6 +94,7 @@ const fetchUnused = async (event: {
       : await fetchOne();
 
   if (!todaysEvent) {
+    await disableEventBridgeRule();
     throw "No unused documents left, or DB is empty";
   }
 
