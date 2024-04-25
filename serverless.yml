@@ -10,7 +10,7 @@ custom:
     path: .env
 
   caravarvelImagesbucket: caravarvel-images-bucket
-  evenBridgeCronJob: marvel-ai-fetch-events-de-FetchUnusedEventsRuleSche-mp8UuiYYaN44
+  fetchUnusedCronJob: trigger-fetch-unused-cron
 
 provider:
   name: aws
@@ -31,7 +31,7 @@ provider:
       - Effect: Allow
         Action:
           - events:DisableRule
-        Resource: arn:aws:events:${self:provider.region}:${aws:accountId}:rule/${self:custom.evenBridgeCronJob}
+        Resource: arn:aws:events:${self:provider.region}:${aws:accountId}:rule/${self:custom.fetchUnusedCronJob}
 
 package: 
   individually: true
@@ -47,6 +47,7 @@ functions:
     timeout: 45
     events:
       - schedule:
+          name: ${self:custom.fetchUnusedCronJob}
           rate: cron(0 10 * * ? *)
           enabled: true
     environment:
