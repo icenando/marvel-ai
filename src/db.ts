@@ -41,6 +41,7 @@ export const disableEventBridgeRule = async () => {
         Name: eventBridgeRule,
       })
       .promise();
+      console.info('Disabled event bridge cron job')
   } catch (disableError) {
     console.error("Unable to disable rule.");
     throw JSON.stringify(disableError, null, 2);
